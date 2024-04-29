@@ -48,9 +48,6 @@ def read_emotes_from_csv():
     channel_emotes_df.fillna("", inplace = True)
     channel_emotes_df = channel_emotes_df.reset_index(drop = True)
 
-    # print(global_emotes_list)
-    # print(channel_emotes_df)
-
     return [global_emotes_list, channel_emotes_df]
 
 
@@ -81,28 +78,23 @@ def wordIsChannelOrGlobalEmote(word, channel_emotes_df, global_emotes_list):
 
 # Load registered emotes into pandas dataframes
 #emotes_df has the global twitch, global ffz, global 7tv, and then the base emotes for all streamer channels
-with open('/emote_dict', 'rb') as f:
+with open('emote_dict', 'rb') as f:
     emotes_df = pickle.load(f) #emotes is a Pandas Dataframe (255 rows x 2383 columns)
     emotes_df.replace(['NaN', 'nan'], np.nan, inplace = True)
     emotes_df.fillna("", inplace = True)
 
 
 #bttv_emotes has global bttv emotes in one column and then bttv emotes from streamers in other columns
-with open('/bttv_dict', 'rb') as f:
+with open('bttv_dict', 'rb') as f:
     bttv_emotes_df = pickle.load(f) #495 rows x 2023 columns
     bttv_emotes_df.replace(['NaN', 'nan'], np.nan, inplace = True)
     bttv_emotes_df.fillna("", inplace = True)
 
 #ffz_emotes has ffz emotes from streamers
-with open('/ffz_dict', 'rb') as f:
+with open('ffz_dict', 'rb') as f:
     ffz_emotes_df = pickle.load(f).T #76 rows x 321 columns
     ffz_emotes_df.replace(['NaN', 'nan'], np.nan, inplace = True)
     ffz_emotes_df.fillna("", inplace = True)
-
-# print(emotes_df)
-# print(bttv_emotes_df)
-# print(ffz_emotes_df)
-
 
 #Only need to compute_and_writetocsv() once to write all the emotes
 #compute_and_write_emotestocsv()
@@ -164,7 +156,8 @@ for index, row in toxicity_df.iterrows():
 df = pd.DataFrame.from_dict(emote_toxicity_dict, orient='index', columns = ['Number of times emote was toxic', 'Number of times emote was NOT toxic', "Global emote", "Channel emote"])
 df = df.rename_axis('Emote').reset_index()
 
-print(df.head(20))
+# Example output
+print(df.head(10))
 
 #df["Number of times emote was used"] = df["Number of times emote was NOT toxic"] + df["Number of times emote was toxic"]
 df["Toxicity Ratio"] = df["Number of times emote was toxic"] / (df["Number of times emote was NOT toxic"] + df["Number of times emote was toxic"]) #last column to provide us with toxicity ratio
@@ -182,12 +175,7 @@ import pandas as pd
 
 
 #Read csv file
-df = pd.read_csv("/content/Emote_analysis_llama_1.csv")
-
-#Count nulls in each column (there are no nulls)
-print(df.isna().sum())
-print(df.dtypes)
-
+df = pd.read_csv("ToxicityRatio_From_Output_RoBERTa.csv")
 
 #Replacing the infinities with a large finite value for plotting the histogram
 df['Toxicity Ratio'].replace(np.inf, np.nan, inplace=True)
@@ -274,12 +262,7 @@ from scipy.spatial.distance import jensenshannon
 
 
 #Read csv file
-df = pd.read_csv("/content/Emote_analysis_llama_1.csv")
-
-#Count nulls in each column (there are no nulls)
-print(df.isna().sum())
-print(df.dtypes)
-
+df = pd.read_csv("ToxicityRatio_From_Output_RoBERTa.csv")
 
 #Replacing the infinities with a large finite value for plotting the histogram
 df['Toxicity Ratio'].replace(np.inf, np.nan, inplace=True)
@@ -335,5 +318,4 @@ total_height3=height3/sum(height3)
 
 jsDist=jensenshannon(total_height2,total_height3,base=2)
 
-# print(jsDist)
 print("JS distance between distributions for global and channel emotes is:",jsDist)
